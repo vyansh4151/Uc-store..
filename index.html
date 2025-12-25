@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Millionaire YT UC Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0c0c0c 0%,#1a0033 100%);color:#fff;overflow-x:hidden;}
+        .container{max-width:400px;margin:0 auto;padding:20px;min-height:100vh;display:flex;flex-direction:column;}
+        .header{text-align:center;margin-bottom:30px;}
+        .logo{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;background:linear-gradient(45deg,#ffd700,#ff6b35,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px;animation:pulse 2s infinite;cursor:pointer;}
+        .tagline{color:#aaa;font-size:14px;font-weight:300;}
+        .progress-container{display:flex;justify-content:space-between;margin-bottom:30px;position:relative;}
+        .progress-step{width:30px;height:30px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;position:relative;z-index:2;transition:all 0.3s ease;}
+        .progress-step.active{background:linear-gradient(45deg,#ffd700,#ff6b35);box-shadow:0 0 20px rgba(255,215,0,0.5);}
+        .progress-step.completed{background:#00ff88;color:#000;}
+        .progress-line{height:2px;background:#333;position:absolute;top:14px;width:calc(33.33% - 15px);z-index:1;transition:background 0.3s ease;}
+        .progress-line.active{background:linear-gradient(90deg,#ffd700,#ff6b35);}
+        .step{display:none;animation:slideIn 0.5s ease;}.step.active{display:block;}
+        @keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+        .step-content{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border-radius:20px;padding:30px 20px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.3);}
+        .step-title{font-family:'Orbitron',monospace;font-size:24px;font-weight:700;text-align:center;margin-bottom:20px;background:linear-gradient(45deg,#ffd700,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .packs-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;}
+        .pack-card{background:rgba(255,255,255,0.1);border-radius:15px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s ease;border:2px solid transparent;}
+        .pack-card:hover{transform:translateY(-5px);border-color:#ffd700;box-shadow:0 15px 30px rgba(255,215,0,0.3);}
+        .pack-card.selected{border-color:#ffd700 !important;background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,107,53,0.2));transform:translateY(-5px) !important;box-shadow:0 15px 30px rgba(255,215,0,0.4) !important;}
+        .pack-uc{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#00ff88;margin-bottom:5px;}
+        .pack-price{font-size:18px;font-weight:700;color:#ffd700;}
+        .form-group{margin-bottom:20px;}
+        .form-label{display:block;font-weight:600;margin-bottom:8px;color:#ddd;}
+        .form-input{width:100%;padding:15px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:12px;color:#fff;font-size:16px;transition:all 0.3s ease;}
+        .form-input:focus{outline:none;border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,0.3);background:rgba(255,255,255,0.15);}
+        .form-input::placeholder{color:#aaa;}
+        .payment-section{text-align:center;}
+        .upi-qr{width:180px;height:180px;margin:20px auto;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:none;}
+        .upi-id{font-family:monospace;font-size:18px;font-weight:700;color:#ffd700;word-break:break-all;background:rgba(0,0,0,0.5);padding:10px;border-radius:10px;margin:15px 0;display:none;}
+        .file-upload-area{border:3px dashed #ffd700;border-radius:15px;padding:40px 20px;text-align:center;transition:all 0.3s ease;cursor:pointer;background:rgba(255,215,0,0.1);margin:20px 0;}
+        .file-upload-area:hover{background:rgba(255,215,0,0.2);}
+        .file-upload-area.dragover{border-color:#00ff88;background:rgba(0,255,136,0.2);}
+        #screenshotPreview{max-width:100%;max-height:200px;border-radius:10px;margin-top:15px;display:none;}
+        .btn{padding:15px 30px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.3s ease;width:100%;margin-bottom:10px;}
+        .btn-primary{background:linear-gradient(45deg,#ffd700,#ff6b35);color:#000;box-shadow:0 10px 25px rgba(255,215,0,0.4);}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(255,215,0,0.5);}
+        .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:2px solid rgba(255,255,255,0.3);}
+        .btn:disabled{opacity:0.5;cursor:not-allowed;}
+        .success-screen{text-align:center;padding:60px 20px;}
+        .success-icon{font-size:80px;color:#00ff88;margin-bottom:20px;animation:bounce 1s infinite;}
+        #countdownSection{margin:20px 0;}
+        #countdownBar{width:100%;height:10px;background:#333;border-radius:5px;overflow:hidden;margin:10px 0;}
+        #progressFill{height:100%;background:linear-gradient(90deg,#ffd700,#ff6b35);width:0%;transition:width 1s linear;}
+        #countdownText{font-size:20px;font-weight:700;color:#ffd700;margin:15px 0;}
+        #orderStatus{font-size:16px;padding:10px;background:rgba(255,255,255,0.1);border-radius:10px;margin:10px 0;}
+        #ownerModal,#ownerPanel{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;}
+        #ownerPanel{right:-100%;width:100%;max-width:400px;background:linear-gradient(135deg,#0c0c0c,#1a0033);transition:all 0.3s;}
+        #ownerPanel.open{right:0;}
+        .modal-content{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a0033,#0c0c0c);padding:30px;border-radius:20px;border:2px solid #ffd700;width:90%;max-width:350px;}
+        .owner-header{padding:20px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;}
+        .order-item{background:rgba(255,255,255,0.05);margin:10px;padding:15px;border-radius:10px;border-left:4px solid #ffd700;}
+        .order-status{font-size:12px;padding:4px 12px;border-radius:20px;margin:5px 0;}
+        .status-pending{background:#ffd700;color:#000;}
+        .status-delivered{background:#00ff88;color:#000;}
+        .status-declined{background:#ff4444;color:#fff;}
+        .owner-btn{padding:8px 15px;border:none;border-radius:6px;font-weight:600;cursor:pointer;margin:3px;font-size:14px;}
+        .btn-deliver{background:#00ff88;color:#000;}
+        .btn-decline{background:#ff4444;color:#fff;}
+        @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);}}
+        @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0);}40%{transform:translateY(-10px);}60%{transform:translateY(-5px);}}
+        @media(max-width:480px){.container{padding:15px;}.logo{font-size:24px;}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo" onclick="toggleOwnerLogin()">Millionaire YT UC</h1>
+            <p class="tagline">India's #1 Trusted UC ⚡ 10-15 Min Delivery</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-line" id="line1"></div><div class="progress-step active" data-step="1">1</div>
+            <div class="progress-line" id="line2"></div><div class="progress-step" data-step="2">2</div>
+            <div class="progress-line" id="line3"></div><div class="progress-step" data-step="3">3</div>
+            <div class="progress-line" id="line4"></div><div class="progress-step" data-step="4">4</div>
+        </div>
+        
+        <div id="step1" class="step active">
+            <div class="step-content">
+                <h2 class="step-title">Select UC Pack</h2>
+                <div class="packs-grid" id="packsGrid">
+                    <div class="pack-card" data-uc="60" data-price="40"><div class="pack-uc">60 UC</div><div class="pack-price">₹40</div></div>
+                    <div class="pack-card" data-uc="1900" data-price="950"><div class="pack-uc">1900 UC</div><div class="pack-price">₹950</div></div>
+                    <div class="pack-card" data-uc="3850" data-price="1540"><div class="pack-uc">3850 UC</div><div class="pack-price">₹1540</div></div>
+                    <div class="pack-card" data-uc="8100" data-price="2430"><div class="pack-uc">8100 UC</div><div class="pack-price">₹2430</div></div>
+                    <div class="pack-card" data-uc="16200" data-price="4100"><div class="pack-uc">16200 UC</div><div class="pack-price">₹4100</div></div>
+                    <div class="pack-card" data-uc="32400" data-price="7800"><div class="pack-uc">32400 UC</div><div class="pack-price">₹7800</div></div>
+                </div>
+                <button class="btn btn-primary" id="next1" disabled>Continue →</button>
+            </div>
+        </div>
+        
+        <div id="step2" class="step">
+            <div class="step-content">
+                <h2 class="step-title">Enter Details</h2>
+                <div class="form-group"><label class="form-label">Selected: <span id="selectedPackDisplay">-</span></label></div>
+                <div class="form-group"><label class="form-label">BGMI UID (10 digits)</label><input type="tel" class="form-input" id="uid" placeholder="1234567890" maxlength="10"></div>
+                <div class="form-group"><label class="form-label">In-Game Name (IGN)</label><input type="text" class="form-input" id="ign" placeholder="ProGamer"></div>
+                <button class="btn btn-secondary" id="back2">← Back</button>
+                <button class="btn btn-primary" id="next2" disabled>Continue to Payment →</button>
+            </div>
+        </div>
+        
+        <div id="step3" class="step">
+            <div class="step-content">
+                <h2 class="step-title">Complete Payment</h2>
+                <div class="payment-section">
+                    <img src="https://via.placeholder.com/180x180/ffd700/000000?text=UPI+QR" class="upi-qr" id="upiQr" alt="UPI QR">
+                    <div class="upi-id" id="upiId">yourupi@paytm</div>
+                    <p style="color:#ffd700;font-size:16px;margin:20px 0;">Pay <strong id="paymentAmount">₹0</strong> via UPI</p>
+                </div>
+                <div class="file-upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:48px;color:#ffd700;margin-bottom:15px;"></i>
+                    <p>📸 Upload Payment Screenshot</p>
+                    <p style="color:#aaa;font-size:14px;">PNG/JPG (Max 5MB)</p>
+                    <input type="file" id="screenshot" accept="image/*" style="display:none;">
+                    <img id="screenshotPreview" alt="Preview">
+                </div>
+                <button class="btn btn-secondary" id="back3">← Back</button>
+                <button class="btn btn-primary" id="submitBtn" disabled>🚀 Send Order</button>
+            </div>
+        </div>
+        
+        <div id="step4" class="step">
+            <div class="step-content success-screen">
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                <h2 class="success-title">✅ Order Confirmed!</h2>
+                <p style="color:#ddd;font-size:16px;">Screenshot sent to admin. UC in 10-15 mins.</p>
+                <div id="countdownSection" style="display:none;">
+                    <div id="countdownBar"><div id="progressFill"></div></div>
+                    <p id="countdownText">⏳ Payment Verification (5:00)</p>
+                    <p id="orderStatus">Waiting for admin verification...</p>
+                </div>
+                <button class="btn btn-primary" onclick="location.reload()">New Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Panel -->
+    <div id="ownerModal">
+        <div class="modal-content">
+            <h3 style="color:#ffd700;margin-bottom:20px;">🔐 Owner Login</h3>
+            <input type="email" id="ownerEmail" class="form-input" placeholder="thebasicgamermlbb@gmail.com" style="margin-bottom:15px;">
+            <input type="password" id="ownerPass" class="form-input" placeholder="Intro!123" style="margin-bottom:20px;">
+            <button class="btn btn-primary" id="ownerLogin" style="margin-bottom:10px;">Login</button>
+            <button class="btn btn-secondary" id="closeOwner">Close</button>
+        </div>
+    </div>
+    <div id="ownerPanel">
+        <div class="owner-header">
+            <h3>📊 Owner Dashboard</h3>
+            <button id="togglePanel" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">✕</button>
+        </div>
+        <div id="ordersList" style="padding:20px;height:calc(100vh - 100px);overflow-y:auto;"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // 🔥 YOUR FIREBASE CONFIG (ALREADY ADDED) 🔥
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVMrarnVoMKI6Qb8SysuG3Kacc3oyqgQU",
+            authDomain: "uc-store-2025.firebaseapp.com",
+            databaseURL: "https://uc-store-2025-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "uc-store-2025",
+            storageBucket: "uc-store-2025.firebasestorage.app",
+            messagingSenderId: "107556404838",
+            appId: "1:107556404838:web:017fc6bb6a566b0d8137a7"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // 🔥 YOUR OWNER CREDENTIALS (ALREADY SET) 🔥
+        const OWNER_EMAIL = "thebasicgamermlbb@gmail.com";
+        const OWNER_PASS = "Intro!123";
+        
+        let currentStep=1, selectedPack=null, screenshotFile=null, currentOrderId=null, orderTimer=null;
+        
+        // Customer Flow
+        document.querySelectorAll('.pack-card').forEach(card=>{
+            card.onclick=()=>{document.querySelectorAll('.pack-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selectedPack={uc:card.dataset.uc,price:card.dataset.price};document.getElementById('next1').disabled=false;}
+        });
+        
+        document.getElementById('next1').onclick=()=>{if(selectedPack){document.getElementById('selectedPackDisplay').textContent=`${selectedPack.uc} UC - ₹${selectedPack.price}`;showStep(2);}};
+        
+        document.getElementById('uid').oninput=document.getElementById('ign').oninput=validateStep2;
+        function validateStep2(){const uid=document.getElementById('uid').value,ign=document.getElementById('ign').value;document.getElementById('next2').disabled=!(uid.length===10&&ign.trim());}
+        
+        document.getElementById('next2').onclick=()=>{document.getElementById('paymentAmount').textContent=`₹${selectedPack.price}`;document.getElementById('upiQr').style.display='block';document.getElementById('upiId').style.display='block';showStep(3);};
+        
+        document.getElementById('back2').onclick=()=>showStep(1);
+        document.getElementById('back3').onclick=()=>showStep(2);
+        
+        // File Upload
+        const uploadArea=document.getElementById('uploadArea'),fileInput=document.getElementById('screenshot'),preview=document.getElementById('screenshotPreview'),submitBtn=document.getElementById('submitBtn');
+        uploadArea.onclick=()=>fileInput.click();
+        fileInput.onchange=handleFile;
+        ['dragenter','dragover','dragleave','drop'].forEach(e=>uploadArea.addEventListener(e,preventDefaults,false));
+        function preventDefaults(e){e.preventDefault();e.stopPropagation();}
+        ['dragenter','dragover'].forEach(e=>uploadArea.addEventListener(e,()=>uploadArea.classList.add('dragover'),false));
+        ['dragleave','drop'].forEach(e=>uploadArea.addEventListener(e,()=>uploadArea.classList.remove('dragover'),false));
+        uploadArea.ondrop=e=>{fileInput.files=e.dataTransfer.files;handleFile({target:fileInput});};
+        function handleFile(e){const file=e.target.files[0];if(file&&file.type.startsWith('image/')&&file.size<5*1024*1024){screenshotFile=file;const reader=new FileReader();reader.onload=ee=>{preview.src=ee.target.result;preview.style.display='block';submitBtn.disabled=false;};reader.readAsDataURL(file);}}
+        
+        // MAIN SUBMIT
+        submitBtn.onclick=async()=>{
+            if(!screenshotFile||!selectedPack)return;
+            submitBtn.disabled=true;submitBtn.textContent='Processing...';
+            const uid=document.getElementById('uid').value.trim(),ign=document.getElementById('ign').value.trim();
+            const orderData={uc:selectedPack.uc,price:selectedPack.price,uid:uid,ign:ign,timestamp:firebase.firestore.FieldValue.serverTimestamp(),status:'pending'};
+            try{
+                const orderRef=await db.collection('orders').add(orderData);
+                currentOrderId=orderRef.id;
+                db.collection('orders').doc(currentOrderId).onSnapshot(doc=>{
+                    if(doc.exists){const data=doc.data();updateOrderStatus(data.status,data.message||'');}
+                });
+                showStep(4);
+                document.querySelector('.success-icon').innerHTML='<i class="fas fa-clock"></i>';
+                document.querySelector('.success-title').textContent='⏳ Order Received!';
+                document.getElementById('countdownSection').style.display='block';
+                startCountdown();
+            }catch(e){alert('Error! Try again.');submitBtn.disabled=false;submitBtn.textContent='🚀 Send Order';}
+        };
+        
+        function startCountdown(){let timeLeft=300;orderTimer=setInterval(()=>{timeLeft--;const m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById('countdownText').textContent=`⏳ Payment Verification (${m}:${s.toString().padStart(2,'0')})`;document.getElementById('progressFill').style.width=((300-timeLeft)/300*100)+'%';if(timeLeft<=0){clearInterval(orderTimer);document.getElementById('orderStatus').textContent='❌ Time expired. Contact admin.';}},1000);}
+        
+        function updateOrderStatus(status,message){
+            const statusEl=document.getElementById('orderStatus');clearInterval(orderTimer);
+            if(status==='delivered'){statusEl.innerHTML='✅ UC Delivered! Check BGMI.';document.querySelector('.success-icon').innerHTML='<i class="fas fa-check-circle"></i>';document.querySelector('.success-title').textContent='🎉 UC Delivered!';document.getElementById('countdownSection').style.display='none';}
+            else if(status==='declined'){statusEl.innerHTML=`❌ ${message||'Payment Declined'}`;document.querySelector('.success-icon').innerHTML='<i class="fas fa-times-circle"></i>';document.querySelector('.success-title').textContent='❌ Order Declined';document.getElementById('countdownSection').style.display='none';}
+        }
+        
+        function showStep(step){document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));document.getElementById(`step${step}`).classList.add('active');currentStep=step;updateProgress();}
+        function updateProgress(){document.querySelectorAll('.progress-step').forEach((step,i)=>{step.classList.toggle('completed',i<currentStep-1);step.classList.toggle('active',i===currentStep-1);});document.querySelectorAll('.progress-line').forEach((l,i)=>l.classList.toggle('active',i<currentStep-1));}
+        
+        // Owner Functions
+        function toggleOwnerLogin(){document.getElementById('ownerModal').style.display='block';}
+        document.getElementById('ownerLogin').onclick=()=>{
+            const email=document.getElementById('ownerEmail').value,pass=document.getElementById('ownerPass').value;
+            if(email===OWNER_EMAIL&&pass===OWNER_PASS){
+                localStorage.setItem('ownerLoggedIn','true');document.getElementById('ownerModal').style.display='none';loadOwnerPanel();document.getElementById('ownerPanel').classList.add('open');
+            }else{alert('❌ Wrong credentials!');}
+        };
+        document.getElementById('closeOwner').onclick=()=>document.getElementById('ownerModal').style.display='none';
+        
+        function loadOwnerPanel(){
+            db.collection('orders').orderBy('timestamp','desc').onSnapshot(snapshot=>{
+                const list=document.getElementById('ordersList');list.innerHTML='';
+                snapshot.forEach(doc=>{
+                    const data=doc.data(),div=document.createElement('div');div.className='order-item';
+                    div.innerHTML=`<div style="font-weight:700;color:#ffd700;">${data.uc} UC - ₹${data.price}</div><div>🆔 ${data.uid} | ${data.ign}</div><div class="order-status status-${data.status}">${data.status.toUpperCase()}</div><div>${data.status==='pending'?'<button class="owner-btn btn-deliver" onclick="ownerAction(\\'${doc.id}\\',\\'deliver\\')">✅ Deliver</button><button class="owner-btn btn-decline" onclick="ownerAction(\\'${doc.id}\\',\\'decline\\')">❌ Decline</button>':'<span style="color:#00ff88;">✓ Action Taken</span>'}</div>`;
+                    list.appendChild(div);
+                });
+            });
+        }
+        
+        window.ownerAction=async(id,action)=>{
+            let msg='';if(action==='decline'){msg=prompt('Decline reason:')||'Invalid payment';}
+            await db.collection('orders').doc(id).update({status:action,message:msg,adminTime:firebase.firestore.FieldValue.serverTimestamp()});
+        };
+        
+        document.getElementById('togglePanel').onclick=()=>{
+            const panel=document.getElementById('ownerPanel');
+            panel.classList.toggle('open');
+        };
+        
+        if(localStorage.getItem('ownerLoggedIn')==='true'){loadOwnerPanel();}
+    </script>
+</body>
+</html>
